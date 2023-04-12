@@ -1,0 +1,15 @@
+version: "3.9"
+
+services:
+  database:
+    image: postgres:latest
+    container_name: MortyGRAB
+    ports:
+      - "5432:5432"
+    volumes:
+      - /var/lib/postgresql/data/
+    environment:
+      - POSTGRES_DB=MortyGRAB
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=pass
+    restart: unless-stopped
