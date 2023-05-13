@@ -16,7 +16,7 @@ func (h *Handler) Register (c *gin.Context){
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
-
+	fmt.Println(2)
 	id, err := h.service.Authorization.CreateUser(input)
 
 	if err != nil{

@@ -11,16 +11,16 @@ import (
 
 type Handler struct {
 	service   service.Services
-	db *pgsql.Postgres
-	logger *logger.Logger
+	db        *pgsql.Postgres
+	logger    *logger.Logger
 	responder *utils.Responder
 }
 
 func NewHandler(service service.Services, db *pgsql.Postgres, logger *logger.Logger) *Handler {
 	return &Handler{
 		service:   service,
-		db : db,
-		logger: logger,
+		db:        db,
+		logger:    logger,
 		responder: utils.NewResponder(logger),
 	}
 }
@@ -39,44 +39,28 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		{
 			users.GET("/client", h.GetUsers)
 
-			users.POST("/client", h.PostUsers)
-
 			users.PUT("/client", h.PutUsers)
 
 			users.DELETE("/client", h.DeleteUsers)
 
 		}
+		api.GET("sites/", h.GetListSites)
 		site := api.Group("/sites")
 		{
-			site.GET("/site", h.GetSites)
+			site.GET("/site", h.GetSite)
 
-			site.POST("/site", h.PostSites)
+			site.POST("/site", h.PostSite)
 
-			site.PUT("/site", h.PutSites)
-
-			site.DELETE("/site", h.DeleteSites)
+			site.DELETE("/site", h.DeleteSite)
 		}
 
 		text := api.Group("/texts")
 		{
-			text.GET("/text", h.GetTexts)
+			text.GET("/text", h.GetText)
 
-			text.POST("/text", h.PostTexts)
+			text.POST("/text", h.PostText)
 
-			text.PUT("/text", h.PutTexts)
-
-			text.DELETE("/text", h.DeleteTexts)
-
-		}
-		page := api.Group("/pages")
-		{
-			page.GET("/page", h.GetPages)
-
-			page.POST("/page", h.PostPages)
-
-			page.PUT("/page", h.PutPages)
-
-			page.DELETE("/page", h.DeletePages)
+			text.PUT("/text", h.PutText)
 		}
 	}
 

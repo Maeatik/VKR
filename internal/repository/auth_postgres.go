@@ -6,7 +6,6 @@ import (
 	"diploma/pkg/pgsql"
 	"fmt"
 
-	"github.com/jackc/pgx/v5"
 	// "errors"
 	// "fmt"
 )
@@ -29,19 +28,27 @@ func (a *AuthPostgres) CreateUser(user v1.User) (int, error) {
 	rowQuery := a.db.QueryRow(ctx, roleQuery)
 
 	if err := rowQuery.Scan(&count); err != nil {
-		fmt.Println(2)
 		return 0, err
 	}
+
 	isUniq := true
 	checkQuery := `SELECT password FROM "Users"`
 
-	row := a.db.QueryRow(ctx, checkQuery)
-	if err := row.Scan(&passwords); err != nil {
-		if err != pgx.ErrNoRows{
+	rows, err := a.db.Query(ctx, checkQuery)
+	if err != nil{
+		return 0, err
+	}
+	defer rows.Close()
+	for rows.Next(){
+		var password string
+
+		err = rows.Scan(&password)
+		if err != nil{
 			return 0, err
 		}
-	} 
-	
+		passwords = append(passwords, password)
+	}
+
 	for _, password := range passwords {
 		if password == user.Password {
 			isUniq = false
@@ -49,16 +56,16 @@ func (a *AuthPostgres) CreateUser(user v1.User) (int, error) {
 		}
 	}
 
-	query := `INSERT INTO "Users" (id, login, password) VALUES ($1, $2, $3) RETURNING id`
+	query := `INSERT INTO "Users" (login, password) VALUES ($1, $2) RETURNING id`
 	if isUniq {
 		if count == 0 {
-			row := a.db.QueryRow(ctx, query, 1, user.Name, user.Password)
+			row := a.db.QueryRow(ctx, query, user.Name, user.Password)
 			if err := row.Scan(&id); err != nil {
 				return 0, err
 			}
 			return id, nil
 		} else {
-			row := a.db.QueryRow(ctx, query, 1, user.Name, user.Password)
+			row := a.db.QueryRow(ctx, query,  user.Name, user.Password)
 			if err := row.Scan(&id); err != nil {
 				return 0, err
 			}

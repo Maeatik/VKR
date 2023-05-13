@@ -1,45 +1,45 @@
 package repository
 
 import (
+	"context"
 	v1 "diploma/internal/entity/v1"
 	"diploma/pkg/pgsql"
+	"time"
 )
+
 type Authorization interface {
 	CreateUser(user v1.User) (int, error)
 	GetUser(name, password string) (v1.User, error)
 }
 
 type Service interface {
-	GetUsers(login string, password string) (v1.User, error)
-	PostUsers() error
-	UpdateUsers(id int, login string, password string) error
-	DeleteUsers(id int) error
+	GetUsers(ctx context.Context, id int) (v1.User, error)
+	UpdateUsers(ctx context.Context, id int, login string, password string) error
+	DeleteUsers(ctx context.Context, id int) error
 
-	GetSites()  error
-	PostSites() error
-	UpdateSites() error
-	DeleteSites()  error
+	GetSite(ctx context.Context, userID int, id int) (v1.Site, error)
+	GetListSites(ctx context.Context, userID int) ([]v1.Site, error)
+	PostSite(ctx context.Context, userID int, url string, tag string) error
+	DeleteSite(ctx context.Context, userID int, id int) error
+	
 
-	GetMainText()  error
-	PostMainText() error
-	UpdateMainText()  error
-	DeleteMainText()  error
+	GetMainText(ctx context.Context, userID int, id int, siteID int) (v1.MainText, error)
+	PostMainText(ctx context.Context, userID int, siteID int, date time.Time, text string) error
+	UpdateMainText(ctx context.Context, userID int, id int, siteID int, date time.Time, text string) error 
 
-	GetPageSites() error
-	PostPageSites() error
-	UpdatePageSites()  error
-	DeletePageSites() error
+	DeleteAllSiteTexts(ctx context.Context, userID int, id int) error
+	DeleteAllTexts(ctx context.Context, userID int) error
+	DeleteAllSites(ctx context.Context, userID int) error
 }
 
 type Repository struct {
 	Authorization
 	Service
-
 }
 
 func NewRepository(db *pgsql.Postgres) *Repository {
 	return &Repository{
-		Authorization: 	NewAuthPostgres(db),
-		Service: NewClientService(db),
+		Authorization: NewAuthPostgres(db),
+		Service:       NewClientService(db),
 	}
 }

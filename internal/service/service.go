@@ -1,30 +1,24 @@
 package service
 
 import (
+	"context"
 	v1 "diploma/internal/entity/v1"
 	"diploma/internal/repository"
 )
 
 type Service interface {
-	GetUsers(login string, password string) (v1.User, error)
-	PostUsers() error
-	UpdateUsers(id int, login string, password string) error
-	DeleteUsers(id int) error
+	GetUsers(ctx context.Context, id int) (v1.User, error)
+	UpdateUsers(ctx context.Context, id int, login string, password string) error
+	DeleteUsers(ctx context.Context, id int) error
 
-	GetSites()  error
-	PostSites() error
-	UpdateSites() error
-	DeleteSites()  error
+	GetSite(ctx context.Context, userID int, id int) (v1.Site, error)
+	GetListSites(ctx context.Context, userID int) ([]v1.Site, error)
+	PostSite(ctx context.Context, userID int, url string, tag string) error
+	DeleteSite(ctx context.Context, userID int, id int) error
 
-	GetMainText()  error
-	PostMainText() error
-	UpdateMainText()  error
-	DeleteMainText()  error
-
-	GetPageSites() error
-	PostPageSites() error
-	UpdatePageSites()  error
-	DeletePageSites() error
+	GetMainText(ctx context.Context, userID int, id int, siteID int) (v1.MainText, error)
+	PostMainText(ctx context.Context, userID int, siteID int, text string) error
+	UpdateMainText(ctx context.Context, userID int, id int, siteID int, text string) error
 }
 
 type Authorization interface {
@@ -38,10 +32,9 @@ type Services struct {
 	Service
 }
 
-func NewServices(rep *repository.Repository) *Services  {
+func NewServices(rep *repository.Repository) *Services {
 	return &Services{
 		Authorization: NewAuthService(rep.Authorization),
-		Service: NewClientService(rep.Service),
+		Service:       NewClientService(rep.Service),
 	}
 }
-
