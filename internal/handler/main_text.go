@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	v1 "diploma/internal/entity/v1"
+	"io/ioutil"
 	"net/http"
 	"time"
 
@@ -84,3 +85,19 @@ func (h *Handler) PutText(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, "updated")
 }
+
+func (h *Handler) DocHandler(c *gin.Context) {
+    text := "that is my first document"
+
+    file := []byte(text)
+
+   	if err := ioutil.WriteFile("document.doc", file, 0644); err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Не удалось создать документ"})
+        return
+    }
+
+    c.Writer.Header().Set("Content-Disposition", "attachment; filename=document.doc")
+    c.Writer.Header().Set("Content-Type", "application/msword")
+    c.File("document.doc")
+}
+

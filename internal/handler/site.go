@@ -48,13 +48,13 @@ func (h *Handler) PostSite(c *gin.Context) {
 		return
 	}
 	
-	err = h.service.Service.PostSite(ctx, userId, site.Url, site.Tag)
+	siteID, err := h.service.Service.PostSite(ctx, userId, site.Url, site.Tag)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	c.JSON(http.StatusOK, userId)
+	c.JSON(http.StatusOK, siteID)
 }
 
 func (h *Handler) DeleteSite(c *gin.Context) {
@@ -98,4 +98,29 @@ func (h *Handler) GetListSites(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, site)
+}
+
+func (h *Handler) ParseSite(c *gin.Context) {
+    ctx := context.Background()
+
+	userId, err := getUserId(c)
+
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, "id is not found")
+		return
+	}
+
+	var site v1.Site
+	if err := c.BindJSON(&site); err != nil {
+		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+	
+	err = h.service.Service.ParseSite(ctx, userId, site.Url, site.Tag)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, userId)
 }

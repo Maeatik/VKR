@@ -52,8 +52,9 @@ func (h *Handler) InitRoutes() *gin.Engine {
 			site.POST("/site", h.PostSite)
 
 			site.DELETE("/site", h.DeleteSite)
-		}
 
+			
+		}
 		text := api.Group("/texts")
 		{
 			text.GET("/text", h.GetText)
@@ -62,6 +63,9 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 			text.PUT("/text", h.PutText)
 		}
+
+		api.POST("/parse", h.ParseSite)
+		api.GET("/download", h.DocHandler)
 	}
 
 	return router

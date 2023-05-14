@@ -91,13 +91,23 @@ func (c *ClientServicePostgres) GetListSites(ctx context.Context, userID int) ([
 	return sites, nil
 }
 
-func (c *ClientServicePostgres) PostSite(ctx context.Context, userID int, url string, tag string) error {
-	query := `INSERT INTO "Site" ("user_id(FK)", "url", tag) VALUES ($1, $2, $3)`
-	_, err := c.db.Exec(ctx, query, userID, url, tag)
+func (c *ClientServicePostgres) PostSite(ctx context.Context, userID int, url string, tag string) (int, error) {
+	var id int
+	query := `INSERT INTO "Site" ("user_id(FK)", "url", tag) VALUES ($1, $2, $3)  REturning id`
+	rows, err := c.db.Query(ctx, query, userID, url, tag)
 	if err != nil {
-		return fmt.Errorf("error while insert new site result: %s", err.Error())
+		return 0, fmt.Errorf("error while insert new site result: %s", err.Error())
 	}
-	return nil
+	defer rows.Close()
+	for rows.Next(){
+		if err := rows.Scan(&id); err != nil{
+			return 0, err
+		}
+	}
+
+	fmt.Println(id)
+
+	return id, nil
 }
 
 func (c *ClientServicePostgres) DeleteSite(ctx context.Context, userID int, id int) error {
@@ -163,5 +173,10 @@ func (c *ClientServicePostgres) DeleteAllSiteTexts(ctx context.Context, userID i
 	if err != nil {
 		return fmt.Errorf("error while delete all maintexts of tag: %s", err.Error())
 	}
+	return nil
+}
+
+
+func (c *ClientServicePostgres) ParseSite(ctx context.Context, userID int, url, tag string) error{
 	return nil
 }

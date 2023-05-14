@@ -13,12 +13,14 @@ type Service interface {
 
 	GetSite(ctx context.Context, userID int, id int) (v1.Site, error)
 	GetListSites(ctx context.Context, userID int) ([]v1.Site, error)
-	PostSite(ctx context.Context, userID int, url string, tag string) error
+	PostSite(ctx context.Context, userID int, url string, tag string) (int, error)
 	DeleteSite(ctx context.Context, userID int, id int) error
 
 	GetMainText(ctx context.Context, userID int, id int, siteID int) (v1.MainText, error)
 	PostMainText(ctx context.Context, userID int, siteID int, text string) error
 	UpdateMainText(ctx context.Context, userID int, id int, siteID int, text string) error
+
+	ParseSite(ctx context.Context, userID int, url, tag string) error
 }
 
 type Authorization interface {
