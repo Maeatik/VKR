@@ -71,7 +71,7 @@ func (a *AuthPostgres) CreateUser(user v1.User) (int, error) {
 			return id, nil
 		}
 	} else {
-		return 0, fmt.Errorf("password is busy")
+		return 0, nil
 	}
 }
 
