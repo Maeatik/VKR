@@ -19,15 +19,18 @@ func (h *Handler) Register (c *gin.Context){
 	}
 	fmt.Println(2)
 	id, err := h.service.Authorization.CreateUser(input)
-
 	if err != nil{
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
+	if id == 0{
+		newErrorResponse(c, http.StatusNotAcceptable, "Имя аккаунта уже занято")
+		return
+	}
+
 	c.JSON(http.StatusOK, map[string]interface{}{
 		"id": id,
-
 	})
 
 }

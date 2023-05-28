@@ -103,7 +103,7 @@ func (h *Handler) GetListSites(c *gin.Context) {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
-
+	
 	c.JSON(http.StatusOK, site)
 }
 

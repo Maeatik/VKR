@@ -50,9 +50,8 @@ func (a *AuthPostgres) CreateUser(user v1.User) (int, error) {
 	}
 
 	for _, login := range logins {
-		if login == user.Password {
+		if login == user.Name {
 			isUniq = false
-			fmt.Println(isUniq)
 		}
 	}
 
