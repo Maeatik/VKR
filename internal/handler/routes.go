@@ -6,6 +6,7 @@ import (
 	"diploma/pkg/logger"
 	"diploma/pkg/pgsql"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -27,6 +28,12 @@ func NewHandler(service service.Services, db *pgsql.Postgres, logger *logger.Log
 
 func (h *Handler) InitRoutes() *gin.Engine {
 	router := gin.New()
+
+	config := cors.DefaultConfig()
+	config.AllowOrigins = []string{"http://localhost:5173"} // Укажите разрешенные источники (origins) для доступа к вашему серверу
+	config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}
+	config.AllowHeaders = []string{"Origin", "Content-Type", "Authorization", "x-data"}
+	router.Use(cors.New(config))
 
 	auth := router.Group("/auth")
 	{
@@ -53,7 +60,6 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 			site.DELETE("/site", h.DeleteSite)
 
-			
 		}
 		text := api.Group("/texts")
 		{
@@ -63,10 +69,10 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 			text.PUT("/text", h.PutText)
 		}
-
+		api.PUT("/passwordChange", h.ChangePassword)
 		api.POST("/parse", h.ParseSite)
 		api.GET("/download", h.DocHandler)
 	}
-
+	
 	return router
 }

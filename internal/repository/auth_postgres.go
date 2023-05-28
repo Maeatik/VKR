@@ -23,7 +23,7 @@ func (a *AuthPostgres) CreateUser(user v1.User) (int, error) {
 	
 	var id int
 	var count int
-	var passwords []string
+	var logins []string
 	roleQuery := `SELECT COUNT(*) FROM "Users"`
 	rowQuery := a.db.QueryRow(ctx, roleQuery)
 
@@ -32,7 +32,7 @@ func (a *AuthPostgres) CreateUser(user v1.User) (int, error) {
 	}
 
 	isUniq := true
-	checkQuery := `SELECT password FROM "Users"`
+	checkQuery := `SELECT login FROM "Users"`
 
 	rows, err := a.db.Query(ctx, checkQuery)
 	if err != nil{
@@ -40,17 +40,17 @@ func (a *AuthPostgres) CreateUser(user v1.User) (int, error) {
 	}
 	defer rows.Close()
 	for rows.Next(){
-		var password string
+		var login string
 
-		err = rows.Scan(&password)
+		err = rows.Scan(&login)
 		if err != nil{
 			return 0, err
 		}
-		passwords = append(passwords, password)
+		logins = append(logins, login)
 	}
 
-	for _, password := range passwords {
-		if password == user.Password {
+	for _, login := range logins {
+		if login == user.Password {
 			isUniq = false
 			fmt.Println(isUniq)
 		}

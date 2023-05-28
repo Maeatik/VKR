@@ -7,12 +7,14 @@ import (
 )
 
 type Service interface {
+	GetUser(ctx context.Context, id int) (v1.User, error)
 	GetUsers(ctx context.Context, id int) (v1.User, error)
 	UpdateUsers(ctx context.Context, id int, login string, password string) error
-	DeleteUsers(ctx context.Context, id int) error
+	ChangePassword(ctx context.Context, id int, password string, newPassword string) error
+	DeleteUsers(ctx context.Context, id int, password string) error
 
 	GetSite(ctx context.Context, userID int, id int) (v1.Site, error)
-	GetListSites(ctx context.Context, userID int) ([]v1.Site, error)
+	GetListSites(ctx context.Context, userID int) ([]v1.Sites, error)
 	PostSite(ctx context.Context, userID int, url string, tag string) (int, error)
 	DeleteSite(ctx context.Context, userID int, id int) error
 

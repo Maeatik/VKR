@@ -35,19 +35,8 @@ func GetTextRelatedToTag(url, tag, word string) (string, error) {
 	closestWords := findClosestWords(words, word)
 
 	fmt.Println(closestWords)
-	if len(closestWords) >= 3 {
-		fmt.Println(text)
-	}
-	// Сбор текста, связанного с близкими словами
-	var relatedText string
-	for _, w := range closestWords {
-		if strings.Contains(text, w) {
-			relatedText += w + " "
-		}
-	}
-
-	if relatedText == "" {
-		return "", nil
+	if len(closestWords) < 3 {
+		return "Текст не релевантен", nil
 	}
 
 	return text, nil

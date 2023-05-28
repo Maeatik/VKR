@@ -13,6 +13,7 @@ func (h *Handler) Register (c *gin.Context){
 	var input v1.User
 	fmt.Println(1)
 	if err :=c.BindJSON(&input); err != nil{
+		h.logger.Info("error while parse json request")
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}

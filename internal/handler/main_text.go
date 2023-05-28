@@ -3,6 +3,8 @@ package handler
 import (
 	"context"
 	v1 "diploma/internal/entity/v1"
+	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"time"
@@ -19,8 +21,11 @@ func (h *Handler) GetText(c *gin.Context) {
 		return
 	}
 	var textID v1.TextID
+	
+	xData := c.Request.Header.Get("X-Data")
 
-	if err := c.BindJSON(&textID); err != nil {
+	if err := json.Unmarshal([]byte(xData), &textID); err != nil {
+		h.logger.Info("error while parsing json info about text")
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
@@ -87,10 +92,34 @@ func (h *Handler) PutText(c *gin.Context) {
 }
 
 func (h *Handler) DocHandler(c *gin.Context) {
-    text := "that is my first document"
+	fmt.Println(1)
+	ctx := context.Background()
 
-    file := []byte(text)
+	userId, err := getUserId(c)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, "id is not found")
+		return
+	}
+	var textID v1.TextID
+	
+	xData := c.Request.Header.Get("X-Data")
+	if err := json.Unmarshal([]byte(xData), &textID); err != nil {
+		h.logger.Info("error while parsing json info about text")
+		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
 
+	fmt.Println("text",textID.Id)
+	fmt.Println("site",textID.SiteId)
+    text, err := h.service.Service.GetMainText(ctx, userId, textID.Id, textID.SiteId)
+	if err != nil {
+		h.logger.Info("error while getting text")
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+    file := []byte(text.Text)
+	fmt.Println(file)
    	if err := ioutil.WriteFile("document.doc", file, 0644); err != nil {
         c.JSON(http.StatusInternalServerError, gin.H{"error": "Не удалось создать документ"})
         return

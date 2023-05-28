@@ -17,6 +17,9 @@ func NewClientService(rep repository.Service) *ClientService {
 	return &ClientService{rep: rep}
 }
 
+func (c *ClientService) GetUser(ctx context.Context, id int) (v1.User, error){
+	return c.rep.GetUser(ctx, id)
+}
 func (c *ClientService) GetUsers(ctx context.Context, id int) (v1.User, error) {
 	return c.rep.GetUsers(ctx, id)
 }
@@ -24,7 +27,33 @@ func (c *ClientService) GetUsers(ctx context.Context, id int) (v1.User, error) {
 func (c *ClientService) UpdateUsers(ctx context.Context, id int, login string, password string) error {
 	return c.rep.UpdateUsers(ctx, id, login, password)
 }
-func (c *ClientService) DeleteUsers(ctx context.Context, id int) error {
+func (c *ClientService) ChangePassword(ctx context.Context, id int, password string, newPassword string) error {
+	var newPass string
+
+	checking := GeneratePasswordHash(password)
+	user, err := c.rep.GetUser(ctx, id)
+	if err != nil{
+		return err
+	}
+
+	if user.Password != checking {
+		return err
+	}
+	fmt.Println(newPass)
+	return c.rep.UpdateUsers(ctx, id, user.Name, newPassword)
+}
+
+func (c *ClientService) DeleteUsers(ctx context.Context, id int, password string) error {
+	checking := GeneratePasswordHash(password)
+	user, err := c.rep.GetUser(ctx, id)
+	if err != nil{
+		return err
+	}
+
+	if user.Password != checking {
+		return err
+	}
+	
 	if err := c.rep.DeleteAllTexts(ctx, id); err != nil {
 		return err
 	}
@@ -39,7 +68,7 @@ func (c *ClientService) DeleteUsers(ctx context.Context, id int) error {
 func (c *ClientService) GetSite(ctx context.Context, userID int, id int) (v1.Site, error) {
 	return c.rep.GetSite(ctx, userID, id)
 }
-func (c *ClientService) GetListSites(ctx context.Context, userID int) ([]v1.Site, error) {
+func (c *ClientService) GetListSites(ctx context.Context, userID int) ([]v1.Sites, error) {
 	return c.rep.GetListSites(ctx, userID)
 }
 func (c *ClientService) PostSite(ctx context.Context, userID int, url string, tag string) (int, error) {
@@ -73,7 +102,7 @@ func (c *ClientService) ParseSite(ctx context.Context, userID int, url, tag stri
 	if err != nil{
 		return err
 	}
-
+	fmt.Println(text)
 	siteID, err := c.rep.PostSite(ctx, userID, url, tag)
 	if err != nil{
 		return err

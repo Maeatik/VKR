@@ -4,10 +4,12 @@ import (
 	//"net/http"
 	"context"
 	v1 "diploma/internal/entity/v1"
+	"encoding/json"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
+
 
 func (h *Handler) GetSite(c *gin.Context) {
 	ctx := context.Background()
@@ -43,11 +45,12 @@ func (h *Handler) PostSite(c *gin.Context) {
 	}
 
 	var site v1.Site
+
 	if err := c.BindJSON(&site); err != nil {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
-	
+
 	siteID, err := h.service.Service.PostSite(ctx, userId, site.Url, site.Tag)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
@@ -67,7 +70,11 @@ func (h *Handler) DeleteSite(c *gin.Context) {
 		return
 	}
 	var site v1.SiteID
-	if err := c.BindJSON(&site); err != nil {
+
+	xData := c.Request.Header.Get("X-Data")
+
+	if err := json.Unmarshal([]byte(xData), &site); err != nil {
+		h.logger.Info("error while parsing json info about text")
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
@@ -101,7 +108,7 @@ func (h *Handler) GetListSites(c *gin.Context) {
 }
 
 func (h *Handler) ParseSite(c *gin.Context) {
-    ctx := context.Background()
+	ctx := context.Background()
 
 	userId, err := getUserId(c)
 
@@ -115,7 +122,7 @@ func (h *Handler) ParseSite(c *gin.Context) {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
-	
+
 	err = h.service.Service.ParseSite(ctx, userId, site.Url, site.Tag)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
