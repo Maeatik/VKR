@@ -108,6 +108,7 @@ func (h *Handler) GetListSites(c *gin.Context) {
 }
 
 func (h *Handler) ParseSite(c *gin.Context) {
+	h.logger.Info(">>Start Parsing")
 	ctx := context.Background()
 
 	userId, err := getUserId(c)
@@ -130,4 +131,5 @@ func (h *Handler) ParseSite(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, userId)
+	h.logger.Info(">>End Parsing")
 }

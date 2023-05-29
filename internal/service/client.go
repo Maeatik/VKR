@@ -17,7 +17,7 @@ func NewClientService(rep repository.Service) *ClientService {
 	return &ClientService{rep: rep}
 }
 
-func (c *ClientService) GetUser(ctx context.Context, id int) (v1.User, error){
+func (c *ClientService) GetUser(ctx context.Context, id int) (v1.User, error) {
 	return c.rep.GetUser(ctx, id)
 }
 func (c *ClientService) GetUsers(ctx context.Context, id int) (v1.User, error) {
@@ -32,7 +32,7 @@ func (c *ClientService) ChangePassword(ctx context.Context, id int, password str
 
 	checking := GeneratePasswordHash(password)
 	user, err := c.rep.GetUser(ctx, id)
-	if err != nil{
+	if err != nil {
 		return err
 	}
 
@@ -46,14 +46,14 @@ func (c *ClientService) ChangePassword(ctx context.Context, id int, password str
 func (c *ClientService) DeleteUsers(ctx context.Context, id int, password string) error {
 	checking := GeneratePasswordHash(password)
 	user, err := c.rep.GetUser(ctx, id)
-	if err != nil{
+	if err != nil {
 		return err
 	}
 
 	if user.Password != checking {
 		return err
 	}
-	
+
 	if err := c.rep.DeleteAllTexts(ctx, id); err != nil {
 		return err
 	}
@@ -98,17 +98,21 @@ func (c *ClientService) UpdateMainText(ctx context.Context, userID int, id int, 
 }
 
 func (c *ClientService) ParseSite(ctx context.Context, userID int, url, tag string) error {
-	text, err := usecase.GetTextRelatedToTag(url, "\"p\"", tag)
-	if err != nil{
+	texts, err := usecase.GetTextRelatedToTag(url, "\"p\"", tag)
+	if err != nil {
 		return err
 	}
-	fmt.Println(text)
-	siteID, err := c.rep.PostSite(ctx, userID, url, tag)
-	if err != nil{
-		return err
+	for textKey, textValue := range texts {
+		siteID, err := c.rep.PostSite(ctx, userID, textKey, tag)
+		if err != nil {
+			return err
+		}
+
+		date := time.Now()
+		if err = c.rep.PostMainText(ctx, userID, siteID, date, textValue); err != nil{
+			return err
+		}
 	}
 
-	date := time.Now()
-
-	return c.rep.PostMainText(ctx, userID, siteID, date, text)
+	return nil
 }
