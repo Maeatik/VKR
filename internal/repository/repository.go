@@ -7,6 +7,8 @@ import (
 	"time"
 )
 
+//go:generate mockgen -source=repository.go -destination=mocks/repository_mock.go
+
 type Authorization interface {
 	CreateUser(user v1.User) (int, error)
 	GetUser(name, password string) (v1.User, error)
