@@ -27,7 +27,7 @@ func GeneratePasswordHash(password string) string {
 	return sha
 }
 
-func (c *ClientServicePostgres) GetUser(ctx context.Context, id int) (v1.User, error){
+func (c *ClientServicePostgres) GetUser(ctx context.Context, id int) (v1.User, error) {
 	var user v1.User
 	row := c.db.QueryRow(ctx, `SELECT login, password FROM "Users" WHERE id = $1`, id)
 	if err := row.Scan(&user.Name, &user.Password); err != nil {
@@ -50,11 +50,9 @@ func (c *ClientServicePostgres) GetUsers(ctx context.Context, id int) (v1.User, 
 }
 
 func (c *ClientServicePostgres) UpdateUsers(ctx context.Context, id int, login string, password string) error {
-	hashPassword := GeneratePasswordHash(password)
-
 	var user v1.User
 
-	_, err := c.db.Exec(ctx, `UPDATE "Users" SET login = $1, password = $2 WHERE id=$3`, login, hashPassword, id)
+	_, err := c.db.Exec(ctx, `UPDATE "Users" SET login = $1, password = $2 WHERE id=$3`, login, password, id)
 	if err != nil {
 		fmt.Println(user.Id)
 		return err

@@ -28,19 +28,18 @@ func (c *ClientService) UpdateUsers(ctx context.Context, id int, login string, p
 	return c.rep.UpdateUsers(ctx, id, login, password)
 }
 func (c *ClientService) ChangePassword(ctx context.Context, id int, password string, newPassword string) error {
-	var newPass string
-
 	checking := GeneratePasswordHash(password)
+
 	user, err := c.rep.GetUser(ctx, id)
 	if err != nil {
 		return err
 	}
 
 	if user.Password != checking {
-		return err
+		return fmt.Errorf("dismatches passwords")
 	}
-	fmt.Println(newPass)
-	return c.rep.UpdateUsers(ctx, id, user.Name, newPassword)
+
+	return c.rep.UpdateUsers(ctx, id, user.Name, GeneratePasswordHash(newPassword))
 }
 
 func (c *ClientService) DeleteUsers(ctx context.Context, id int, password string) error {
@@ -51,7 +50,7 @@ func (c *ClientService) DeleteUsers(ctx context.Context, id int, password string
 	}
 
 	if user.Password != checking {
-		return err
+		return fmt.Errorf("dismatches passwords")
 	}
 
 	if err := c.rep.DeleteAllTexts(ctx, id); err != nil {
@@ -79,7 +78,7 @@ func (c *ClientService) DeleteSite(ctx context.Context, userID int, id int) erro
 	if err := c.rep.DeleteAllSiteTexts(ctx, userID, id); err != nil {
 		return err
 	}
-	fmt.Println(2)
+	
 	return c.rep.DeleteSite(ctx, userID, id)
 }
 

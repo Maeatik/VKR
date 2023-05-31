@@ -6,6 +6,8 @@ import (
 	"diploma/internal/repository"
 )
 
+//go:generate mockgen -source=service.go -destination=mocks/service_mock.go
+
 type Service interface {
 	GetUser(ctx context.Context, id int) (v1.User, error)
 	GetUsers(ctx context.Context, id int) (v1.User, error)

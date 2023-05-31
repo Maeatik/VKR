@@ -22,7 +22,7 @@ func Run(cfg config.Config, port string, log *logger.Logger) error{
 
 	rep := repository.NewRepository(serviceDb)
 	services := service.NewServices(rep)
-	handlers := handler.NewHandler(*services, serviceDb, log)
+	handlers := handler.NewHandler(*services, log)
 
 	if err := server.Run(port, handlers.InitRoutes()); err != nil{
 		fmt.Println(err)
