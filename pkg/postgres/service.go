@@ -16,7 +16,7 @@ type PostgresRepository struct {
 }
 
 func New(cfg config.Config, log *logger.Logger) (*pgsql.Postgres, error) {
-	psqlInfo := "postgres://postgres:pass@localhost:5432/MortyGRAB?sslmode=disable"
+	psqlInfo := "postgres://postgres:pass@localhost:5432/MortyGRAB?sslmode=disable1"
 	//psqlInfo := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", cfg.Username, cfg.Password, cfg.Host, cfg.Port, cfg.DBName)
 	fmt.Println(psqlInfo)
 	db, err := pgsql.New(psqlInfo)
