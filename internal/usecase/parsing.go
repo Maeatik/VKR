@@ -224,7 +224,8 @@ func DetectLanguage(word string) (string, error) {
 func RemoveExtraCharacters(word string) string {
 	// Определяем набор символов, которые нужно удалитьfffffff
 	charsToRemove := ",.\"'«»()"
-
+//qqqqqqqqqqqqqq
+//fdadb97c464eb562e75eaac559cf8734ca3bedf94f
 	// Заменяем каждый символ из набора на пустую строку
 	for _, char := range charsToRemove {
 		word = strings.ReplaceAll(word, string(char), "")
